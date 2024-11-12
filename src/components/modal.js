@@ -13,7 +13,7 @@ export const animatingPopup = (popups) => {
 
 
 // Открытия попапа
-export const openPopup = (popupElement, closePopupKeydown, closePopupOverlay) => {
+export const openPopup = (popupElement) => {
     editPopupClass(popupElement);
     document.addEventListener('keydown', closePopupKeydown);
     popupElement.addEventListener('click', closePopupOverlay);

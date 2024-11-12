@@ -2,7 +2,7 @@
 import './pages/index.css';
 import {initialCards} from  "./components/cards";
 import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal";
-import {createCard, deleteCard, likeCard, imageCard} from "./components/card.js"
+import {createCard, deleteCard, likeCard} from "./components/card.js"
 
 
 // Константы
@@ -21,6 +21,10 @@ const popupTypeNewCard = document.querySelector('.popup_type_new-card');
 const cardName = popupTypeNewCard.querySelector('.popup__input_type_card-name');
 const cardUrl = popupTypeNewCard.querySelector('.popup__input_type_url');
 const popups = document.querySelectorAll('.popup');
+const popupTypeImage = document.querySelector('.popup_type_image');
+const popupTypeImageCaption = popupTypeImage.querySelector('.popup__caption');
+const popupTypeImageImage = popupTypeImage.querySelector('.popup__image');
+const formNewPlace = document.forms.namedItem('new-place');
 const data = {};
 
 
@@ -35,7 +39,7 @@ initialCards.forEach(item => {
 // Слушатель открытия попапа редактирования профиля
 editButton.addEventListener('click', () => {
     openPopup(popupTypeEdit, closePopupKeydown, closePopupOverlay);
-    fieldsProfileForm();
+    fillProfileForm();
 });
 
 
@@ -48,7 +52,7 @@ closeButtons.forEach((closeButton) => {
 
 
 // Подтягиваем данные из профиля в форму
-const fieldsProfileForm = () => {
+const fillProfileForm = () => {
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDescription.textContent;
 };
@@ -59,7 +63,7 @@ function handleFormSubmit(evt) {
     evt.preventDefault();
     profileTitle.textContent = nameInput.value;
     profileDescription.textContent = jobInput.value;
-    closePopup(evt.target.closest('.popup_is-opened'));
+    closePopup(popupTypeEdit);
 }
 
 
@@ -83,15 +87,25 @@ function addCard(evt) {
     data.name = cardName.value;
     data.link = cardUrl.value;
     placesList.prepend(createCard(data, deleteCard, likeCard, imageCard))
-    cardName.value = '';
-    cardUrl.value = '';
-    closePopup(evt.target.closest('.popup_is-opened'));
+    formNewPlace.reset();
+    closePopup(popupTypeNewCard);
 }
 
 
 // Прикрепляем обработчик к форме добавления карточки
 
 popupTypeNewCard.addEventListener('submit', addCard);
+
+
+// Click по карточке
+
+export function imageCard (event) {
+    popupTypeImageCaption.textContent = event.target.offsetParent.innerText;
+    popupTypeImageImage.src = event.target.currentSrc;
+    popupTypeImageImage.alt = event.target.alt;
+    openPopup(popupTypeImage, closePopupKeydown, closePopupOverlay);
+}
+
 
 
 // Анимирование попапа
