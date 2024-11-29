@@ -3,6 +3,9 @@ import './pages/index.css';
 import {initialCards} from  "./components/cards";
 import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal";
 import {createCard, deleteCard, likeCard} from "./components/card.js"
+import {validationConfig} from "./components/validationConfig.js"
+import {clearValidation, enableValidation} from "./components/validation.js"
+
 
 
 // Константы
@@ -40,6 +43,7 @@ initialCards.forEach(item => {
 editButton.addEventListener('click', () => {
     openPopup(popupTypeEdit, closePopupKeydown, closePopupOverlay);
     fillProfileForm();
+    clearValidation(popupTypeEdit, validationConfig);
 });
 
 
@@ -76,7 +80,8 @@ popupTypeEdit.addEventListener('submit', handleFormSubmit);
 
 addButton.addEventListener('click', () => {
     openPopup(popupTypeNewCard, closePopupKeydown, closePopupOverlay);
-
+    clearValidation(popupTypeNewCard, validationConfig);
+    formNewPlace.reset();
 });
 
 
@@ -107,7 +112,11 @@ export function imageCard (event) {
 }
 
 
-
 // Анимирование попапа
 
 animatingPopup(popups);
+
+
+// Вызов функции вызова слушателя на форму
+
+enableValidation(validationConfig);
