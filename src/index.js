@@ -1,10 +1,11 @@
 // Импорты
 import './pages/index.css';
-import {initialCards} from  "./components/cards";
-import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal";
+import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal.js";
 import {createCard, deleteCard, likeCard} from "./components/card.js"
 import {validationConfig} from "./components/validationConfig.js"
 import {clearValidation, enableValidation} from "./components/validation.js"
+import {downloadCardsList, getProfileInfo, changeProfileInfo} from "./components/api.js"
+import {loadButton} from "./components/loadButton.js"
 
 
 
@@ -19,6 +20,7 @@ const nameInput = popupTypeEdit.querySelector('.popup__input_type_name');
 const jobInput = popupTypeEdit.querySelector('.popup__input_type_description');
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
+const profileImage = document.querySelector('.profile__image');
 const addButton = content.querySelector('.profile__add-button');
 const popupTypeNewCard = document.querySelector('.popup_type_new-card');
 const cardName = popupTypeNewCard.querySelector('.popup__input_type_card-name');
@@ -29,14 +31,23 @@ const popupTypeImageCaption = popupTypeImage.querySelector('.popup__caption');
 const popupTypeImageImage = popupTypeImage.querySelector('.popup__image');
 const formNewPlace = document.forms.namedItem('new-place');
 const data = {};
+let userId = "";
 
 
 
 // Вывести карточки на страницу
 
-initialCards.forEach(item => {
-    placesList.append(createCard(item, deleteCard, likeCard, imageCard))
-})
+Promise.all([getProfileInfo(), downloadCardsList()])
+    .then(([profileInfo, initialCards]) => {
+        userId = profileInfo["_id"];
+        profileTitle.textContent = profileInfo.name;
+        profileDescription.textContent = profileInfo.about;
+        profileImage.style = `background-image: url('${profileInfo.avatar}')`;
+        initialCards.forEach((cards) => {
+            placesList.append(createCard(cards, removeCard, changeCardLikeStatus, openImagePopup, userId));
+        })
+    })
+    .catch(err => console.log(err));
 
 
 // Слушатель открытия попапа редактирования профиля
@@ -62,12 +73,19 @@ const fillProfileForm = () => {
 };
 
 
-// Обработчик «отправки» формы
+// Обработчик «отправки» формы редактирования профиля
 function handleFormSubmit(evt) {
     evt.preventDefault();
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-    closePopup(popupTypeEdit);
+    console.log(evt);
+    loadButton(true, popupTypeEdit.querySelector('.popup__button'));
+    changeProfileInfo(nameInput.value, jobInput.value)
+        .then(profileInfo => {
+            profileTitle.textContent = profileInfo.name;
+            profileDescription.textContent = profileInfo.about;
+            closePopup(popupTypeEdit);
+        })
+        .catch(err => console.log(err))
+        .finally(() => loadButton(false, popupTypeEdit.querySelector('.popup__button')));
 }
 
 
@@ -120,3 +138,4 @@ animatingPopup(popups);
 // Вызов функции вызова слушателя на форму
 
 enableValidation(validationConfig);
+
