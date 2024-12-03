@@ -1,7 +1,7 @@
 # Проектная работа Mesto
 
  Git: https://github.com/Anton-Emelyanov/mesto-project-ff.git  
- Git-Pages:
+ Git-Pages: https://anton-emelyanov.github.io/mesto-project-ff/
 
 ## Описание проекта:
 Mesto — учебный проект, разработанный в рамках курса Яндекс Практикум. 
