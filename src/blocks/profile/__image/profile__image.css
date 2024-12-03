@@ -4,11 +4,25 @@
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-  background-image: url("/src/images/avatar.jpg");
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  position: relative;
 }
+
+.profile__image:hover {
+  opacity: 0.8;
+}
+
+.profile__image:hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: transparent url("/src/images/vector.png") center no-repeat;
+  background-size: 20px;
+}
+
+
 
 @media screen and (max-width: 740px) {
   .profile__image {

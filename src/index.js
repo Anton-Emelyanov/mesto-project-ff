@@ -1,10 +1,10 @@
 // Импорты
 import './pages/index.css';
 import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal.js";
-import {createCard, deleteCard, likeCard} from "./components/card.js"
+import {createCard, removeCard, changeLikeStatus} from "./components/card.js"
 import {validationConfig} from "./components/validationConfig.js"
 import {clearValidation, enableValidation} from "./components/validation.js"
-import {downloadCardsList, getProfileInfo, changeProfileInfo} from "./components/api.js"
+import {downloadCardsList, getProfileInfo, changeProfileInfo, addNewCard, changeProfileImage} from "./components/api.js"
 import {loadButton} from "./components/loadButton.js"
 
 
@@ -16,6 +16,8 @@ const placesList = content.querySelector('.places__list');
 const editButton = content.querySelector('.profile__edit-button');
 const closeButtons = document.querySelectorAll('.popup__close');
 const popupTypeEdit = document.querySelector('.popup_type_edit');
+const profileEditForm = document.querySelector('.popup_edit-profile-image');
+const newProfileImage = document.querySelector('#profile-image-url-input');
 const nameInput = popupTypeEdit.querySelector('.popup__input_type_name');
 const jobInput = popupTypeEdit.querySelector('.popup__input_type_description');
 const profileTitle = document.querySelector('.profile__title');
@@ -30,9 +32,21 @@ const popupTypeImage = document.querySelector('.popup_type_image');
 const popupTypeImageCaption = popupTypeImage.querySelector('.popup__caption');
 const popupTypeImageImage = popupTypeImage.querySelector('.popup__image');
 const formNewPlace = document.forms.namedItem('new-place');
+const formNewAvatar = document.forms.namedItem('edit-profile-image');
 const data = {};
 let userId = "";
 
+
+
+
+// Click по карточке
+
+const imageCard = (cards) => {
+    popupTypeImageCaption.textContent = cards.name;
+    popupTypeImageImage.src = cards.link;
+    popupTypeImageImage.alt = cards.name;
+    openPopup(popupTypeImage, closePopupKeydown, closePopupOverlay);
+};
 
 
 // Вывести карточки на страницу
@@ -44,7 +58,7 @@ Promise.all([getProfileInfo(), downloadCardsList()])
         profileDescription.textContent = profileInfo.about;
         profileImage.style = `background-image: url('${profileInfo.avatar}')`;
         initialCards.forEach((cards) => {
-            placesList.append(createCard(cards, removeCard, changeCardLikeStatus, openImagePopup, userId));
+            placesList.append(createCard(cards, removeCard, changeLikeStatus, imageCard, userId));
         })
     })
     .catch(err => console.log(err));
@@ -55,6 +69,15 @@ editButton.addEventListener('click', () => {
     openPopup(popupTypeEdit, closePopupKeydown, closePopupOverlay);
     fillProfileForm();
     clearValidation(popupTypeEdit, validationConfig);
+});
+
+
+// Слушатель открытия попапа редактирования аватара
+
+profileImage.addEventListener('click', () => {
+    clearValidation(profileEditForm, validationConfig);
+    openPopup(profileEditForm, closePopupKeydown, closePopupOverlay);
+    formNewAvatar.reset();
 });
 
 
@@ -76,7 +99,6 @@ const fillProfileForm = () => {
 // Обработчик «отправки» формы редактирования профиля
 function handleFormSubmit(evt) {
     evt.preventDefault();
-    console.log(evt);
     loadButton(true, popupTypeEdit.querySelector('.popup__button'));
     changeProfileInfo(nameInput.value, jobInput.value)
         .then(profileInfo => {
@@ -94,6 +116,29 @@ function handleFormSubmit(evt) {
 popupTypeEdit.addEventListener('submit', handleFormSubmit);
 
 
+// Редактирование аватара пользователя
+
+const editProfileImage = (evt) => {
+    evt.preventDefault();
+    loadButton(true, profileEditForm.querySelector('.popup__button'));
+    changeProfileImage(newProfileImage.value)
+        .then(res => {
+            profileImage.style = `background-image: url('${res.avatar}')`;
+            closePopup(evt.target.closest('.popup_is-opened'));
+            profileEditForm.reset();
+        })
+        .catch(err => console.log(err))
+        .finally(() => loadButton(false, profileEditForm.querySelector('.popup__button')));
+};
+
+
+// Устанавливаем слушатель на форму редактирования аватара
+
+profileEditForm.addEventListener('submit', (evt) => {
+    editProfileImage(evt);
+});
+
+
 // Слушатель открытия попапа добавления карточки
 
 addButton.addEventListener('click', () => {
@@ -105,29 +150,18 @@ addButton.addEventListener('click', () => {
 
 // Обработчик формы добавления карточки
 
-function addCard(evt) {
+popupTypeNewCard.addEventListener('submit', (evt) => {
     evt.preventDefault();
-    data.name = cardName.value;
-    data.link = cardUrl.value;
-    placesList.prepend(createCard(data, deleteCard, likeCard, imageCard))
-    formNewPlace.reset();
-    closePopup(popupTypeNewCard);
-}
-
-
-// Прикрепляем обработчик к форме добавления карточки
-
-popupTypeNewCard.addEventListener('submit', addCard);
-
-
-// Click по карточке
-
-export function imageCard (event) {
-    popupTypeImageCaption.textContent = event.target.offsetParent.innerText;
-    popupTypeImageImage.src = event.target.currentSrc;
-    popupTypeImageImage.alt = event.target.alt;
-    openPopup(popupTypeImage, closePopupKeydown, closePopupOverlay);
-}
+    loadButton(true, formNewPlace.querySelector('.popup__button'));
+    addNewCard(cardName.value, cardUrl.value)
+        .then(cards => {
+            placesList.prepend(createCard(cards, removeCard, changeLikeStatus, imageCard, userId));
+            closePopup(popupTypeNewCard);
+            formNewPlace.reset();
+        })
+        .catch(err => console.log(err))
+        .finally(() => loadButton(true, formNewPlace.querySelector('.popup__button')));
+});
 
 
 // Анимирование попапа

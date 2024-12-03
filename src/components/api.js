@@ -56,3 +56,62 @@ export const changeProfileInfo = (profileName, aboutInfo) => {
     })
     .then((res) => getRequestStatus(res));
 };
+
+
+// Обновление аватара
+
+export const changeProfileImage = (newImage) => {
+    return fetch(`${authorizationConfig.baseUrl}/users/me/avatar`, {
+        method: 'PATCH',
+        headers: authorizationConfig.headers,
+        body: JSON.stringify({
+            avatar: newImage
+        })
+    })
+    .then((res) => getRequestStatus(res))
+};
+
+
+// Добавление новой карточки
+
+export const addNewCard = (nameInputValue, linkInputValue) => {
+    return fetch(`${authorizationConfig.baseUrl}/cards`, {
+        method: 'POST',
+        headers: authorizationConfig.headers,
+        body: JSON.stringify({
+            name: nameInputValue,
+            link: linkInputValue
+        })
+    })
+    .then((res) => getRequestStatus(res));
+};
+
+
+// Удаление карточки
+
+export const deleteCard = (cardId) => {
+    return fetch(`${authorizationConfig.baseUrl}/cards/${cardId}`, {
+        method: "DELETE",
+        headers: authorizationConfig.headers
+    })
+    .then((res) => getRequestStatus(res))
+};
+
+
+// Постановка и снятие лайка
+
+export const setCardLike = (cardId) => {
+    return fetch(`${authorizationConfig.baseUrl}/cards/likes/${cardId}`, {
+        method: "PUT",
+        headers: authorizationConfig.headers
+    })
+    .then((res) => getRequestStatus(res))
+};
+
+export const removeCardLike = (cardId) => {
+    return fetch(`${authorizationConfig.baseUrl}/cards/likes/${cardId}`, {
+        method: "DELETE",
+        headers: authorizationConfig.headers
+    })
+    .then((res) => getRequestStatus(res))
+};
