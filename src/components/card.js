@@ -10,7 +10,7 @@ const isLike = (cards, userId) => {
 
 // Функция создания карточки
 
-export function createCard(cards, deleteCard, likeCard, openImagePopup, userId){
+export function createCard(cards, deleteCard, changeLikeStatus, openImagePopup, userId){
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
 

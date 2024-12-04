@@ -1,4 +1,6 @@
 // Изменение класса попапа
+import {validationConfig} from "./validationConfig";
+
 const editPopupClass = (popupElement) => {
     popupElement.classList.toggle('popup_is-opened');
 };
@@ -39,3 +41,9 @@ export const closePopupOverlay = (event) => {
         closePopup(event.target.closest('.popup_is-opened'));
     }
 };
+
+export const disableButtonElement = (form) =>{
+    const buttonElement = form.querySelector(validationConfig.submitButtonSelector)
+    buttonElement.classList.add(validationConfig.inactiveButtonClass);
+    buttonElement.disabled = true;
+}

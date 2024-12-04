@@ -1,6 +1,6 @@
 // Импорты
 import './pages/index.css';
-import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal.js";
+import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup, disableButtonElement} from "./components/modal.js";
 import {createCard, removeCard, changeLikeStatus} from "./components/card.js"
 import {validationConfig} from "./components/validationConfig.js"
 import {clearValidation, enableValidation} from "./components/validation.js"
@@ -33,9 +33,7 @@ const popupTypeImageCaption = popupTypeImage.querySelector('.popup__caption');
 const popupTypeImageImage = popupTypeImage.querySelector('.popup__image');
 const formNewPlace = document.forms.namedItem('new-place');
 const formNewAvatar = document.forms.namedItem('edit-profile-image');
-const data = {};
 let userId = "";
-
 
 
 
@@ -78,7 +76,10 @@ profileImage.addEventListener('click', () => {
     clearValidation(profileEditForm, validationConfig);
     openPopup(profileEditForm, closePopupKeydown, closePopupOverlay);
     formNewAvatar.reset();
+    disableButtonElement(profileEditForm);
 });
+
+
 
 
 // Слушатель закрытия попапа
@@ -97,9 +98,11 @@ const fillProfileForm = () => {
 
 
 // Обработчик «отправки» формы редактирования профиля
-function handleFormSubmit(evt) {
+
+function editProfileSubmit(evt) {
     evt.preventDefault();
-    loadButton(true, popupTypeEdit.querySelector('.popup__button'));
+    const submitButtonEditProfile = popupTypeEdit.querySelector(validationConfig.submitButtonSelector)
+    loadButton(true, submitButtonEditProfile);
     changeProfileInfo(nameInput.value, jobInput.value)
         .then(profileInfo => {
             profileTitle.textContent = profileInfo.name;
@@ -107,34 +110,35 @@ function handleFormSubmit(evt) {
             closePopup(popupTypeEdit);
         })
         .catch(err => console.log(err))
-        .finally(() => loadButton(false, popupTypeEdit.querySelector('.popup__button')));
+        .finally(() => loadButton(false, submitButtonEditProfile));
 }
 
 
 // Прикрепляем обработчик к форме редактирования профиля:
 
-popupTypeEdit.addEventListener('submit', handleFormSubmit);
+popupTypeEdit.addEventListener('submit', editProfileSubmit);
 
 
 // Редактирование аватара пользователя
 
 const editProfileImage = (evt) => {
     evt.preventDefault();
-    loadButton(true, profileEditForm.querySelector('.popup__button'));
+    const submitButtonEditAvatar = profileEditForm.querySelector(validationConfig.submitButtonSelector)
+    loadButton(true, submitButtonEditAvatar);
     changeProfileImage(newProfileImage.value)
         .then(res => {
             profileImage.style = `background-image: url('${res.avatar}')`;
             closePopup(evt.target.closest('.popup_is-opened'));
-            profileEditForm.reset();
+            formNewAvatar.reset();
         })
         .catch(err => console.log(err))
-        .finally(() => loadButton(false, profileEditForm.querySelector('.popup__button')));
+        .finally(() => loadButton(false, submitButtonEditAvatar));
 };
 
 
 // Устанавливаем слушатель на форму редактирования аватара
 
-profileEditForm.addEventListener('submit', (evt) => {
+formNewAvatar.addEventListener('submit', (evt) => {
     editProfileImage(evt);
 });
 
@@ -145,6 +149,7 @@ addButton.addEventListener('click', () => {
     openPopup(popupTypeNewCard, closePopupKeydown, closePopupOverlay);
     clearValidation(popupTypeNewCard, validationConfig);
     formNewPlace.reset();
+    disableButtonElement(popupTypeNewCard);
 });
 
 
@@ -152,7 +157,8 @@ addButton.addEventListener('click', () => {
 
 popupTypeNewCard.addEventListener('submit', (evt) => {
     evt.preventDefault();
-    loadButton(true, formNewPlace.querySelector('.popup__button'));
+    const submitButtonAddCard = formNewPlace.querySelector(validationConfig.submitButtonSelector)
+    loadButton(true, submitButtonAddCard);
     addNewCard(cardName.value, cardUrl.value)
         .then(cards => {
             placesList.prepend(createCard(cards, removeCard, changeLikeStatus, imageCard, userId));
@@ -160,7 +166,7 @@ popupTypeNewCard.addEventListener('submit', (evt) => {
             formNewPlace.reset();
         })
         .catch(err => console.log(err))
-        .finally(() => loadButton(true, formNewPlace.querySelector('.popup__button')));
+        .finally(() => loadButton(false, submitButtonAddCard));
 });
 
 
