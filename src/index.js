@@ -1,9 +1,9 @@
 // Импорты
 import './pages/index.css';
-import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup, disableButtonElement} from "./components/modal.js";
+import { openPopup, closePopup, closePopupKeydown, closePopupOverlay, animatingPopup} from "./components/modal.js";
 import {createCard, removeCard, changeLikeStatus} from "./components/card.js"
 import {validationConfig} from "./components/validationConfig.js"
-import {clearValidation, enableValidation} from "./components/validation.js"
+import {clearValidation, enableValidation, disableButtonElement} from "./components/validation.js"
 import {downloadCardsList, getProfileInfo, changeProfileInfo, addNewCard, changeProfileImage} from "./components/api.js"
 import {loadButton} from "./components/loadButton.js"
 
@@ -73,10 +73,11 @@ editButton.addEventListener('click', () => {
 // Слушатель открытия попапа редактирования аватара
 
 profileImage.addEventListener('click', () => {
+    const buttonElement = profileEditForm.querySelector(validationConfig.submitButtonSelector);
     clearValidation(profileEditForm, validationConfig);
     openPopup(profileEditForm, closePopupKeydown, closePopupOverlay);
     formNewAvatar.reset();
-    disableButtonElement(profileEditForm);
+    disableButtonElement(true, buttonElement, validationConfig);
 });
 
 
@@ -146,10 +147,11 @@ formNewAvatar.addEventListener('submit', (evt) => {
 // Слушатель открытия попапа добавления карточки
 
 addButton.addEventListener('click', () => {
+    const buttonElement = popupTypeNewCard.querySelector(validationConfig.submitButtonSelector);
     openPopup(popupTypeNewCard, closePopupKeydown, closePopupOverlay);
     clearValidation(popupTypeNewCard, validationConfig);
     formNewPlace.reset();
-    disableButtonElement(popupTypeNewCard);
+    disableButtonElement(true, buttonElement, validationConfig);
 });
 
 

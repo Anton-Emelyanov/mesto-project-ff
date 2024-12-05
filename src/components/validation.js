@@ -40,13 +40,19 @@ const hasInvalidInput = (inputList) => {
 
 const toggleButtonState = (inputList, buttonElement, validationConfig) => {
   if (hasInvalidInput(inputList)) {
-        buttonElement.disabled = true;
-        buttonElement.classList.add(validationConfig.inactiveButtonClass);
+        disableButtonElement(true, buttonElement, validationConfig)
   } else {
-        buttonElement.disabled = false;
-        buttonElement.classList.remove(validationConfig.inactiveButtonClass);
+         buttonElement.disabled = false;
+         buttonElement.classList.remove(validationConfig.inactiveButtonClass);
   }
 };
+
+
+// функция отключения кнопки
+export const disableButtonElement = (booleanValue, buttonElement, validationConfig) =>{
+    buttonElement.classList.add(validationConfig.inactiveButtonClass);
+    buttonElement.disabled = booleanValue;
+}
 
 
 // Функция, которая проверяет валидность поля
@@ -88,3 +94,5 @@ export const enableValidation = (validationConfig) => {
     setEventListeners(formElement, validationConfig);
   });
 };
+
+
